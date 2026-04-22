@@ -1,0 +1,2 @@
+-- Analytical queries for healthcare_db
+-- Coming soon
