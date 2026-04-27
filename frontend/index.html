@@ -2,10 +2,469 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Healthcare Test Result Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f1f5f9;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --text:      #0f172a;
+      --muted:     #64748b;
+      --accent:    #3b82f6;
+      --accent-dk: #2563eb;
+      --danger:    #ef4444;
+      --success:   #10b981;
+      --warn:      #f59e0b;
+      --radius:    10px;
+      --shadow:    0 4px 24px rgba(0,0,0,.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 16px 80px;
+      color: var(--text);
+    }
+
+    /* ── card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 680px;
+      padding: 40px 44px 44px;
+      animation: rise .45s cubic-bezier(.22,.68,0,1.2) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: var(--accent);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 3px 11px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* ── section heading ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── grid ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .full { grid-column: 1 / -1; }
+
+    /* ── field ── */
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input, select {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0 13px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: #fafbfc;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+      background: #fff;
+    }
+
+    input::placeholder { color: #94a3b8; }
+    select option[value=""] { color: #94a3b8; }
+
+    /* ── actions ── */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      height: 46px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background .18s, transform .12s, box-shadow .18s;
+    }
+
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 0 28px;
+      box-shadow: 0 2px 8px rgba(59,130,246,.35);
+    }
+
+    .btn-primary:hover { background: var(--accent-dk); box-shadow: 0 4px 14px rgba(59,130,246,.4); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 0 22px;
+    }
+
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+    /* ── spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── result banner ── */
+    .result {
+      margin-top: 24px;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      animation: rise .3s ease both;
+    }
+
+    .result-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .result-content { flex: 1; }
+    .result-label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; opacity: .7; margin-bottom: 2px; }
+    .result-value { font-size: 20px; font-weight: 600; }
+    .result-meta  { font-size: 12px; opacity: .65; margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+    .result.normal      { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+    .result.abnormal    { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+    .result.inconclusive { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; }
+    .result.error       { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+
+    /* ── validation error ── */
+    .field-error {
+      font-size: 11.5px;
+      color: var(--danger);
+      margin-top: 2px;
+    }
+
+    input.invalid, select.invalid {
+      border-color: var(--danger);
+    }
+
+    /* ── divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0 24px;
+    }
+
+    /* ── footer ── */
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 28px;
+    }
+
+    /* ── responsive ── */
+    @media (max-width: 540px) {
+      .card { padding: 28px 20px 32px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
+
+<div class="card">
+  <!-- <span class="badge">LuxDevHQ Internship Project</span> -->
   <h1>Healthcare Test Result Predictor</h1>
-  <!-- UI implementation coming soon -->
+  <p class="subtitle">
+    Enter patient information below to get a predicted test result
+    from the deployed machine learning model.
+  </p>
+
+  <p class="section-title">Patient Details</p>
+
+  <div class="grid">
+    <!-- Age -->
+    <div class="field">
+      <label for="age">Age</label>
+      <input id="age" type="number" placeholder="e.g. 45" min="1" max="120" />
+    </div>
+
+    <!-- Gender -->
+    <div class="field">
+      <label for="gender">Gender</label>
+      <select id="gender">
+        <option value="">Select gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+
+    <!-- Blood Type -->
+    <div class="field">
+      <label for="bloodType">Blood Type</label>
+      <select id="bloodType">
+        <option value="">Select blood type</option>
+        <option>A+</option><option>A-</option>
+        <option>B+</option><option>B-</option>
+        <option>AB+</option><option>AB-</option>
+        <option>O+</option><option>O-</option>
+      </select>
+    </div>
+
+    <!-- Admission Type -->
+    <div class="field">
+      <label for="admissionType">Admission Type</label>
+      <select id="admissionType">
+        <option value="">Select admission type</option>
+        <option>Emergency</option>
+        <option>Elective</option>
+        <option>Urgent</option>
+      </select>
+    </div>
+
+    <!-- Billing Amount -->
+    <div class="field">
+      <label for="billing">Billing Amount</label>
+      <input id="billing" type="number" placeholder="e.g. 2000.50" min="0" step="0.01" />
+    </div>
+
+    <!-- Insurance Provider -->
+    <div class="field">
+      <label for="insurance">Insurance Provider</label>
+      <input id="insurance" type="text" placeholder="e.g. Cigna" />
+    </div>
+
+    <!-- Medical Condition -->
+    <div class="field full">
+      <label for="condition">Medical Condition</label>
+      <input id="condition" type="text" placeholder="e.g. Diabetes" />
+    </div>
+
+    <!-- Medication -->
+    <div class="field full">
+      <label for="medication">Medication</label>
+      <input id="medication" type="text" placeholder="e.g. Aspirin" />
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="predictBtn" onclick="runPredict()">
+      Predict Test Result
+    </button>
+    <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
+  </div>
+
+  <div id="resultBox" style="display:none"></div>
+
+  <hr class="divider" />
+  <footer>Powered by FastAPI backend with a trained machine learning model</footer>
+</div>
+
+<script>
+  // ── API base URL ────────────────────────────────────────────────────────
+  // Change this to your deployed URL when hosting on Render / Railway / etc.
+  const API_BASE = window.location.origin.includes("localhost")
+    ? "http://localhost:8000"
+    : window.location.origin;
+
+
+  // ── predict ─────────────────────────────────────────────────────────────
+  async function runPredict() {
+    const btn = document.getElementById("predictBtn");
+    const resultBox = document.getElementById("resultBox");
+
+    // Gather values
+    const age        = document.getElementById("age").value.trim();
+    const gender     = document.getElementById("gender").value;
+    const bloodType  = document.getElementById("bloodType").value;
+    const admission  = document.getElementById("admissionType").value;
+    const billing    = document.getElementById("billing").value.trim();
+    const insurance  = document.getElementById("insurance").value.trim();
+    const condition  = document.getElementById("condition").value.trim();
+    const medication = document.getElementById("medication").value.trim();
+
+    // Basic client-side validation
+    const missing = [];
+    if (!age)        missing.push("Age");
+    if (!gender)     missing.push("Gender");
+    if (!bloodType)  missing.push("Blood Type");
+    if (!admission)  missing.push("Admission Type");
+    if (!billing)    missing.push("Billing Amount");
+    if (!insurance)  missing.push("Insurance Provider");
+    if (!condition)  missing.push("Medical Condition");
+    if (!medication) missing.push("Medication");
+
+    if (missing.length) {
+      showResult("error", "⚠️", "Missing Fields", `Please fill in: ${missing.join(", ")}`);
+      return;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Predicting…';
+    resultBox.style.display = "none";
+
+    try {
+      const payload = {
+        "Age":                parseInt(age),
+        "Gender":             gender,
+        "Blood Type":         bloodType,
+        "Medical Condition":  condition,
+        "Billing Amount":     parseFloat(billing),
+        "Admission Type":     admission,
+        "Insurance Provider": insurance,
+        "Medication":         medication,
+      };
+
+      const resp = await fetch(`${API_BASE}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        const msg = data.detail || `HTTP ${resp.status}`;
+        showResult("error", "✗", "Prediction Failed", msg);
+        return;
+      }
+
+      const result = data.predicted_test_result;
+      const model  = data.model_name ? `Model: ${data.model_name}` : "";
+
+      const map = {
+        Normal:       { cls: "normal",       icon: "✓" },
+        Abnormal:     { cls: "abnormal",      icon: "⚠" },
+        Inconclusive: { cls: "inconclusive",  icon: "?" },
+      };
+
+      const { cls, icon } = map[result] ?? { cls: "error", icon: "?" };
+      showResult(cls, icon, "Predicted Test Result", result, model);
+
+    } catch (err) {
+      showResult("error", "✗", "Connection Error", err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "Predict Test Result";
+    }
+  }
+
+
+  // ── show result ─────────────────────────────────────────────────────────
+  function showResult(cls, icon, label, value, meta = "") {
+    const box = document.getElementById("resultBox");
+    box.style.display = "flex";
+    box.className = `result ${cls}`;
+    box.innerHTML = `
+      <div class="result-icon">${icon}</div>
+      <div class="result-content">
+        <div class="result-label">${label}</div>
+        <div class="result-value">${value}</div>
+        ${meta ? `<div class="result-meta">${meta}</div>` : ""}
+      </div>
+    `;
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+
+  // ── clear ───────────────────────────────────────────────────────────────
+  function clearForm() {
+    ["age","billing","insurance","condition","medication"]
+      .forEach(id => document.getElementById(id).value = "");
+    ["gender","bloodType","admissionType"]
+      .forEach(id => document.getElementById(id).selectedIndex = 0);
+    const box = document.getElementById("resultBox");
+    box.style.display = "none";
+  }
+</script>
 </body>
 </html>
