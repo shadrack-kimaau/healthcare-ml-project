@@ -240,7 +240,12 @@ curl -X POST http://localhost:8000/train
 2. Go to <https://render.com> → **New Web Service**.
 3. Connect your GitHub repo.
 4. Set build command: `pip install uv && uv sync`
-5. Set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+5. Set start command: `feat: Create static UI for healthcare prediction form
+
+- Add HTML form with patient attribute input fields
+- Integrate Swagger/OpenAPI documentation links
+- Include styling and form validation on client side
+- Connect to FastAPI backend via /predict endpoint`
 6. Add environment variables (DB credentials, etc.) in the Render dashboard.
 7. Click **Deploy**.
 
