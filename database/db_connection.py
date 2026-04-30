@@ -14,13 +14,30 @@ from sqlalchemy.orm import Session, sessionmaker
 load_dotenv()
 
 
+# def build_database_url() -> str:
+#     """Construct the PostgreSQL DSN from environment variables."""
+#     host = os.getenv("DB_HOST", "localhost")
+#     port = os.getenv("DB_PORT", "5432")
+#     name = os.getenv("DB_NAME", "healthcare_db")
+#     user = os.getenv("DB_USER", "postgres")
+#     password = os.getenv("DB_PASSWORD", "")
+#     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
 def build_database_url() -> str:
-    """Construct the PostgreSQL DSN from environment variables."""
+    """
+    Priority:
+    1. Use DATABASE_URL if provided (cloud deployment)
+    2. Otherwise build from individual DB_* vars (local dev)
+    """
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        return database_url
+
     host = os.getenv("DB_HOST", "localhost")
     port = os.getenv("DB_PORT", "5432")
     name = os.getenv("DB_NAME", "healthcare_db")
     user = os.getenv("DB_USER", "postgres")
     password = os.getenv("DB_PASSWORD", "")
+
     return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
 
 
